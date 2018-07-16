@@ -1,5 +1,9 @@
 # Augmentor_customizing
-Customize Augmentor 
+Customize Augmentor package
+
+# Customize "Operations.py" and "Pipeline.py"
+-Supplement additional operation.
+-Change original parameters into random variable. 
 
 # How to use
 
