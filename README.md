@@ -2,9 +2,12 @@
 Customize Augmentor package
 
 # Customize "Operations.py" and "Pipeline.py"
--Supplement additional operation.
-
--Change original parameters into random variable. 
+1. Supplement additional operation.
+   - Flip Rotation : expnad a input image with flipped image, rotate the expanded image, and crop the rotated image as its original size
+   
+   - Flip Rotation GaussianBlur : expnad a input image with flipped image, rotate the expanded image, operate Gaussian blurring on the boundary place of central image, and crop as its original size
+   
+2. Change original parameters into random variable. 
 
 # How to use
 
