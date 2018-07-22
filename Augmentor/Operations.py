@@ -89,6 +89,101 @@ class Operation(object):
         """
         raise RuntimeError("Illegal call to base class.")
         
+class RandomScale(Operation):
+
+    def __init__(self, probability, min, max):
+
+        Operation.__init__(self, probability)
+        self.min = min
+        self.max = max
+
+    def perform_operation(self, images):
+
+        def do(image):
+            w, h = image.size
+            
+            scale_factor = random.uniform(self.min, self.max)
+            
+            new_h = int(h * scale_factor)
+            new_w = int(w * scale_factor)
+
+            return image.resize((new_w, new_h), resample=Image.BICUBIC)
+
+        augmented_images = []
+
+        for image in images:
+            augmented_images.append(do(image))
+
+        return augmented_images
+        
+class FlipRotate(Operation):
+
+    def __init__(self, probability, max_left_rotation, max_right_rotation, expand=False):
+
+        Operation.__init__(self, probability)
+        self.max_left_rotation = -abs(max_left_rotation)   # Ensure always negative
+        self.max_right_rotation = abs(max_right_rotation)  # Ensure always positive
+        self.expand = expand
+
+    def perform_operation(self, images):
+
+        w, h = images[0].size
+
+        random_left = random.randint(self.max_left_rotation, 0)
+        random_right = random.randint(0, self.max_right_rotation)
+
+        left_or_right = random.randint(0, 1)
+
+        rotation = 0
+
+        if left_or_right == 0:
+            rotation = random_left
+        elif left_or_right == 1:
+            rotation = random_right
+
+        def do(image):
+            img = np.array(image)
+            
+            img1 = cv2.flip(cv2.flip(img,1),0)
+            img2 = cv2.flip(img,1)
+            img3 = cv2.flip(cv2.flip(img,1),0)
+            
+            img4 = cv2.flip(img,0)
+            img5 = img
+            img6 = cv2.flip(img,0)
+            
+            img7 = cv2.flip(cv2.flip(img,1),0)
+            img8 = cv2.flip(img,1)
+            img9 = cv2.flip(cv2.flip(img,1),0)
+            
+            vis1 = np.concatenate((img1, img2), axis=0)
+            vis1 = np.concatenate((vis1, img3), axis=0)
+            
+            vis2 = np.concatenate((img4, img5), axis=0)
+            vis2 = np.concatenate((vis2, img6), axis=0)
+            
+            vis3 = np.concatenate((img7, img8), axis=0)
+            vis3 = np.concatenate((vis3, img9), axis=0)
+            
+            vis = np.concatenate((vis1, vis2), axis=1)
+            vis = np.concatenate((vis, vis3), axis=1)  
+            
+            image = Image.fromarray(vis)
+            
+            image = image.rotate(rotation, expand=self.expand, resample=Image.BICUBIC)
+            
+            W, H = image.size          
+            
+            return image.crop(((W/2)-(w/2), (H/2)-(h/2), (W/2)+(w/2), (H/2)+(h/2)))       
+
+        augmented_images = []
+
+        for image in images:
+            augmented_images.append(do(image))
+
+        return augmented_images
+        
+
 class GaussianBlur(Operation):
 
     def __init__(self, probability, ksize, sigmaX_min, sigmaX_max):

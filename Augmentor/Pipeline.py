@@ -1580,56 +1580,36 @@ class Pipeline(object):
             self.add_operation(RandomErasing(probability=probability, rectangle_area=rectangle_area))
 
     def gaussian_blur(self, probability, ksize, sigmaX_min, sigmaX_max):
-        """
-        Random change brightness of an image.
 
-        :param probability: A value between 0 and 1 representing the
-         probability that the operation should be performed.
-        :param min_factor: The value between 0.0 and max_factor that define the minimum adjustment of image brightness.
-         The value  0.0 gives a black image, value 1.0 gives the original image, value bigger than 1.0 gives more bright image.
-        :param max_factor: A value should be bigger than min_factor that define the maximum adjustment of image brightness.
-         The value  0.0 gives a black image, value 1.0 gives the original image, value bigger than 1.0 gives more bright image.
-        :return: None
-        """
         if not 0 < probability <= 1:
             raise ValueError(Pipeline._probability_error_text)
         elif not sigmaX_min <= sigmaX_max:
             raise ValueError("The max_factor must be bigger min_factor.")
         else:
             self.add_operation(GaussianBlur(probability=probability, ksize = "RANDOM", sigmaX_min = sigmaX_min, sigmaX_max = sigmaX_max))
+            
+    def flip_rotate(self, probability, max_left_rotation, max_right_rotation,expand = True):
+
+        if not 0 < probability <= 1:
+            raise ValueError(Pipeline._probability_error_text)
+        if not 0 <= max_left_rotation <= 359:
+            raise ValueError("The max_left_rotation argument must be between 0 and 359.")
+        if not 0 <= max_right_rotation <= 359:
+            raise ValueError("The max_right_rotation argument must be between 0 and 359.")
+        else:
+            self.add_operation(FlipRotate(probability=probability, max_left_rotation=ceil(max_left_rotation),
+                                           max_right_rotation=ceil(max_right_rotation),expand=expand))
     
+    def random_scale(self, probability, min, max):
+
+        if not 0 < probability <= 1:
+            raise ValueError(Pipeline._probability_error_text)
+        elif not min <= max:
+            raise ValueError("The max_factor must be bigger min_factor.")
+        else:
+            self.add_operation(RandomScale(probability=probability, min = min, max = max))
+            
     def ground_truth(self, ground_truth_directory):
-        """
-        Specifies a directory containing corresponding images that
-        constitute respective ground truth images for the images
-        in the current pipeline.
-
-        This function will search the directory specified by
-        :attr:`ground_truth_directory` and will associate each ground truth
-        image with the images in the pipeline by file name.
-
-        Therefore, an image titled ``cat321.jpg`` will match with the
-        image ``cat321.jpg`` in the :attr:`ground_truth_directory`.
-        The function respects each image's label, therefore the image
-        named ``cat321.jpg`` with the label ``cat`` will match the image
-        ``cat321.jpg`` in the subdirectory ``cat`` relative to
-        :attr:`ground_truth_directory`.
-
-        Typically used to specify a set of ground truth or gold standard
-        images that should be augmented alongside the original images
-        of a dataset, such as image masks or semantic segmentation ground
-        truth images.
-
-        A number of such data sets are openly available, see for example
-        `https://arxiv.org/pdf/1704.06857.pdf <https://arxiv.org/pdf/1704.06857.pdf>`_
-        (Garcia-Garcia et al., 2017).
-
-        :param ground_truth_directory: A directory containing the
-         ground truth images that correspond to the images in the
-         current pipeline.
-        :type ground_truth_directory: String
-        :return: None.
-        """
 
         num_of_ground_truth_images_added = 0
 
