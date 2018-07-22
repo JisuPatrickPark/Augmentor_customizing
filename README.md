@@ -1,5 +1,5 @@
 # Augmentor_customizing
-Customize Augmentor package
+Customized Augmentor package
 
 # Customize "Operations.py" and "Pipeline.py"
 1. Supplement additional operation.
