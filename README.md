@@ -11,9 +11,11 @@ Customized Augmentor package
    
    - RandomScale : resize the size of input image by random variable.
    
-2. Change original parameters into random variable. 
+2. Change original parameters into random variable.
 
-# How to use
+3. Add csv_operation module for Augmentor.
+
+# How to install
 
 1. Install Augmentor package using pip install. 
 
