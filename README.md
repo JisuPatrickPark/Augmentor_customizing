@@ -1,7 +1,7 @@
 # Augmentor_customizing
 Customized Augmentor package
 
-# Customize "Operations.py" and "Pipeline.py"
+# Whats' different?
 1. Supplement additional operation.
    - GaussianBlur : perform Gaussian blurring on input image.
    
