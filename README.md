@@ -1,7 +1,7 @@
 # Augmentor_customizing
 Customized Augmentor package
 
-# Whats' different?
+# What's different?
 1. Supplement additional operation.
    - GaussianBlur : perform Gaussian blurring on input image.
    
