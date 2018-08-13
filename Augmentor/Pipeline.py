@@ -1609,6 +1609,19 @@ class Pipeline(object):
         else:
             self.add_operation(RandomScale(probability=probability, min = min, max = max))
             
+    def frg(self, probability, max_left_rotation, max_right_rotation, ksize, sigmaX_min=0, sigmaX_max=0, expand=True):
+
+        if not 0 < probability <= 1:
+            raise ValueError(Pipeline._probability_error_text)
+        if not 0 <= max_left_rotation <= 359:
+            raise ValueError("The max_left_rotation argument must be between 0 and 359.")
+        if not 0 <= max_right_rotation <= 359:
+            raise ValueError("The max_right_rotation argument must be between 0 and 359.")
+        #elif not sigmaX_min <= sigmaX_max:
+            #raise ValueError("The max_factor must be bigger min_factor.")
+        else:
+            self.add_operation(FlipRotateGaussian(probability=probability, max_left_rotation=ceil(max_left_rotation), max_right_rotation=ceil(max_right_rotation), ksize = ksize, sigmaX_min = sigmaX_min, sigmaX_max = sigmaX_max, expand=expand))
+            
     def ground_truth(self, ground_truth_directory):
 
         num_of_ground_truth_images_added = 0

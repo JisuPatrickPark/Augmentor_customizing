@@ -89,6 +89,95 @@ class Operation(object):
         """
         raise RuntimeError("Illegal call to base class.")
         
+class FlipRotateGaussian(Operation):
+
+    def __init__(self, probability, max_left_rotation, max_right_rotation, ksize, sigmaX_min, sigmaX_max, expand=True):
+
+        Operation.__init__(self, probability)
+        self.max_left_rotation = -abs(max_left_rotation)   # Ensure always negative
+        self.max_right_rotation = abs(max_right_rotation)  # Ensure always positive
+        self.ksize = ksize
+        self.sigmaX_min = sigmaX_min
+        self.sigmaX_max = sigmaX_max
+        self.expand = expand
+
+    def perform_operation(self, images):
+
+        w, h = images[0].size
+
+        random_left = random.randint(self.max_left_rotation, 0)
+        random_right = random.randint(0, self.max_right_rotation)
+
+        left_or_right = random.randint(0, 1)
+
+        rotation = 0
+
+        if left_or_right == 0:
+            rotation = random_left
+        elif left_or_right == 1:
+            rotation = random_right
+
+        def do(image):
+            img = np.array(image)
+            
+            #w = img[0,:,0].size
+            #h = img[:,0,0].size
+            
+            new_img = np.zeros((h*3,w*3,3), dtype=np.uint8)
+            
+            new_img[:h, :w, :] = cv2.flip(cv2.flip(img,1),0)
+            new_img[:h, w:2*w, :] = cv2.flip(img,0)
+            new_img[:h, 2*w:, :] = cv2.flip(cv2.flip(img,1),0)
+            
+            new_img[h:2*h, :w, :] = cv2.flip(img,1)
+            new_img[h:2*h, w:2*w, :] = img
+            new_img[h:2*h, 2*w:, :] = cv2.flip(img,1)
+            
+            new_img[2*h:, :w, :] = cv2.flip(cv2.flip(img,1),0)
+            new_img[2*h:, w:2*w, :] = cv2.flip(img,0)
+            new_img[2*h:, 2*w:, :] = cv2.flip(cv2.flip(img,1),0)
+            
+            #W = new_img[0,:,0].size
+            #H = new_img[:,0,0].size
+            
+            boundary_1 = new_img[h-7:h+7,w:2*w,:]
+            boundary_2 = new_img[h:2*h,w-7:w+7,:]
+            boundary_3 = new_img[2*h-7:2*h+7,w:2*w,:]
+            boundary_4 = new_img[h:2*h,2*w-7:2*w+7,:]
+            
+            if self.ksize == "RANDOM":
+                ksize = random.choice([(3,3), (5,5), (7,7), (9,9)])
+            else:
+                ksize = self.ksize
+            
+            sigmaX = random.uniform(self.sigmaX_min,self.sigmaX_max)
+            
+            filter_1 = cv2.GaussianBlur(boundary_1,(3,3),sigmaX)
+            filter_2 = cv2.GaussianBlur(boundary_2,(3,3),sigmaX)
+            filter_3 = cv2.GaussianBlur(boundary_3,(3,3),sigmaX)
+            filter_4 = cv2.GaussianBlur(boundary_4,(3,3),sigmaX)
+            
+            new_img[h-7:h+7,w:2*w,:] = filter_1
+            new_img[h:2*h,w-7:w+7,:] = filter_2
+            new_img[2*h-7:2*h+7,w:2*w,:] = filter_3
+            new_img[h:2*h,2*w-7:2*w+7,:] = filter_4  
+            
+            image = Image.fromarray(new_img)
+            
+            #print(rotation)
+            image = image.rotate(rotation, expand=self.expand, resample=Image.BICUBIC)
+            
+            W, H = image.size          
+            
+            return image.crop(((W/2)-(w/2), (H/2)-(h/2), (W/2)+(w/2), (H/2)+(h/2)))       
+
+        augmented_images = []
+
+        for image in images:
+            augmented_images.append(do(image))
+
+        return augmented_images
+        
 class RandomScale(Operation):
 
     def __init__(self, probability, min, max):
