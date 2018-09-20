@@ -18,6 +18,11 @@ Customized Augmentor package
 # How to install
 
 1. Install Augmentor package using pip install. 
+   - pip install Augmentor
 
-2.  Replace "Operations.py" and "Pipeline.py" in original Augmentor package folder to customized files in this resposistory.
+2. Replace "Operations.py" and "Pipeline.py" in original Augmentor package folder to customized files in this resposistory.
+   - Windows : (Anaconda3 or Anaconda2)/Lib/site-packages/Augmentor
+   
+   - Linux : (anaconda3 or anaconda2)/lib/(python3.x or python2.x)/site-packages/Augmentor
+
 
