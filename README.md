@@ -15,8 +15,10 @@ Customized Augmentor package
 
 3. Add csv_operation module for Augmentor.
 
-# How to install
+# Augmentor_autolabel (currently not supported)
+Data augmentation tool for labeled images (especially for object detection). 
 
+# How to install
 1. Install Augmentor package using pip install. 
    - pip install Augmentor
 
